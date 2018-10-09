@@ -105,24 +105,26 @@ function(git_clone)
         message(STATUS "downloading/updating ${PARGS_PROJECT_NAME}")
     endif()
 
+    set(TARGET_REPO_DIR ${${SOURCE_DIR}})
+
     # first clone the repo
-    if(EXISTS ${${SOURCE_DIR}})
+    if(EXISTS ${TARGET_REPO_DIR})
         if(NOT PARGS_QUIET)
-            message(STATUS "${PARGS_PROJECT_NAME} directory found, pulling...")
+            message(STATUS "${TARGET_REPO_DIR} directory found, pulling...")
         endif()
 
         execute_process(
                 COMMAND             ${GIT_EXECUTABLE} pull origin master
                 COMMAND             ${GIT_EXECUTABLE} submodule update --remote
-                WORKING_DIRECTORY   ${${SOURCE_DIR}}
+                WORKING_DIRECTORY   ${TARGET_REPO_DIR}
                 OUTPUT_VARIABLE     git_output)
     else()
         if(NOT PARGS_QUIET)
-            message(STATUS "${PARGS_PROJECT_NAME} directory not found, cloning...")
+            message(STATUS "${TARGET_REPO_DIR} directory not found, cloning...")
         endif()
 
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} clone ${PARGS_GIT_URL} --recursive
+                COMMAND             ${GIT_EXECUTABLE} clone ${PARGS_GIT_URL} ${TARGET_REPO_DIR} --recursive
                 WORKING_DIRECTORY   ${PARGS_DIRECTORY}
                 OUTPUT_VARIABLE     git_output)
     endif()
@@ -136,18 +138,18 @@ function(git_clone)
         execute_process(
                 COMMAND             ${GIT_EXECUTABLE} fetch --all --tags --prune
                 COMMAND             ${GIT_EXECUTABLE} checkout tags/${PARGS_GIT_TAG} -b tag_${PARGS_GIT_TAG}
-                WORKING_DIRECTORY   ${${SOURCE_DIR}}
+                WORKING_DIRECTORY   ${TARGET_REPO_DIR}
                 OUTPUT_VARIABLE     git_output)
     elseif(PARGS_GIT_BRANCH OR PARGS_GIT_COMMIT)
         execute_process(
                 COMMAND             ${GIT_EXECUTABLE} checkout ${PARGS_GIT_BRANCH}
-                WORKING_DIRECTORY   ${${SOURCE_DIR}}
+                WORKING_DIRECTORY   ${TARGET_REPO_DIR}
                 OUTPUT_VARIABLE     git_output)
     else()
         message(STATUS "no tag specified, defaulting to master")
         execute_process(
                 COMMAND             ${GIT_EXECUTABLE} checkout master
-                WORKING_DIRECTORY   ${${SOURCE_DIR}}
+                WORKING_DIRECTORY   ${TARGET_REPO_DIR}
                 OUTPUT_VARIABLE     git_output)
     endif()
 
