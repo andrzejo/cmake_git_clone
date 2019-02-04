@@ -4,9 +4,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/Utils.cmake)
 include(CMakeParseArguments)
 
 find_package(Git)
-if(NOT GIT_FOUND)
+if (NOT GIT_FOUND)
     message(FATAL_ERROR "git not found!")
-endif()
+endif ()
 
 
 # clone a git repo into a directory at configure time
@@ -76,17 +76,17 @@ function(git_clone)
             ${ARGN}                                                             # arguments of the function to parse, here we take the all original ones
     ) # remaining unparsed arguments can be found in PARGS_UNPARSED_ARGUMENTS
 
-    if(NOT PARGS_PROJECT_NAME)
+    if (NOT PARGS_PROJECT_NAME)
         message(FATAL_ERROR "You must provide a project name")
-    endif()
+    endif ()
 
-    if(NOT PARGS_GIT_URL)
+    if (NOT PARGS_GIT_URL)
         message(FATAL_ERROR "You must provide a git url")
-    endif()
+    endif ()
 
-    if(NOT PARGS_DIRECTORY)
+    if (NOT PARGS_DIRECTORY)
         set(PARGS_DIRECTORY ${CMAKE_BINARY_DIR})
-    endif()
+    endif ()
 
     set(${PARGS_PROJECT_NAME}_SOURCE_DIR
             ${PARGS_DIRECTORY}/${PARGS_PROJECT_NAME}
@@ -97,63 +97,63 @@ function(git_clone)
     # check that only one of GIT_TAG xor GIT_BRANCH xor GIT_COMMIT was passed
     at_most_one(at_most_one_tag ${PARGS_GIT_TAG} ${PARGS_GIT_BRANCH} ${PARGS_GIT_COMMIT})
 
-    if(NOT at_most_one_tag)
+    if (NOT at_most_one_tag)
         message(FATAL_ERROR "you can only provide one of GIT_TAG, GIT_BRANCH or GIT_COMMIT")
-    endif()
+    endif ()
 
-    if(NOT PARGS_QUIET)
+    if (NOT PARGS_QUIET)
         message(STATUS "downloading/updating ${PARGS_PROJECT_NAME}")
-    endif()
+    endif ()
 
     set(TARGET_REPO_DIR ${${SOURCE_DIR}})
 
     # first clone the repo
-    if(EXISTS ${TARGET_REPO_DIR})
-        if(NOT PARGS_QUIET)
+    if (EXISTS ${TARGET_REPO_DIR})
+        if (NOT PARGS_QUIET)
             message(STATUS "${TARGET_REPO_DIR} directory found, pulling...")
-        endif()
+        endif ()
 
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} pull origin master
-                COMMAND             ${GIT_EXECUTABLE} submodule update --remote
-                WORKING_DIRECTORY   ${TARGET_REPO_DIR}
-                OUTPUT_VARIABLE     git_output)
-    else()
-        if(NOT PARGS_QUIET)
+                COMMAND ${GIT_EXECUTABLE} pull origin master
+                COMMAND ${GIT_EXECUTABLE} submodule update --remote
+                WORKING_DIRECTORY ${TARGET_REPO_DIR}
+                OUTPUT_VARIABLE git_output)
+    else ()
+        if (NOT PARGS_QUIET)
             message(STATUS "${TARGET_REPO_DIR} directory not found, cloning...")
-        endif()
+        endif ()
 
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} clone ${PARGS_GIT_URL} ${TARGET_REPO_DIR} --recursive
-                WORKING_DIRECTORY   ${PARGS_DIRECTORY}
-                OUTPUT_VARIABLE     git_output)
-    endif()
+                COMMAND ${GIT_EXECUTABLE} clone ${PARGS_GIT_URL} ${TARGET_REPO_DIR} --recursive
+                WORKING_DIRECTORY ${PARGS_DIRECTORY}
+                OUTPUT_VARIABLE git_output)
+    endif ()
 
-    if(NOT PARGS_QUIET)
+    if (NOT PARGS_QUIET)
         message("${git_output}")
-    endif()
+    endif ()
 
     # now checkout the right commit
-    if(PARGS_GIT_TAG)
+    if (PARGS_GIT_TAG)
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} fetch --all --tags --prune
-                COMMAND             ${GIT_EXECUTABLE} checkout tags/${PARGS_GIT_TAG} -b tag_${PARGS_GIT_TAG}
-                WORKING_DIRECTORY   ${TARGET_REPO_DIR}
-                OUTPUT_VARIABLE     git_output)
-    elseif(PARGS_GIT_BRANCH OR PARGS_GIT_COMMIT)
+                COMMAND ${GIT_EXECUTABLE} fetch --all --tags --prune
+                COMMAND ${GIT_EXECUTABLE} checkout tags/${PARGS_GIT_TAG} -b tag_${PARGS_GIT_TAG}
+                WORKING_DIRECTORY ${TARGET_REPO_DIR}
+                OUTPUT_VARIABLE git_output)
+    elseif (PARGS_GIT_BRANCH OR PARGS_GIT_COMMIT)
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} checkout ${PARGS_GIT_BRANCH}
-                WORKING_DIRECTORY   ${TARGET_REPO_DIR}
-                OUTPUT_VARIABLE     git_output)
-    else()
+                COMMAND ${GIT_EXECUTABLE} checkout ${PARGS_GIT_BRANCH}
+                WORKING_DIRECTORY ${TARGET_REPO_DIR}
+                OUTPUT_VARIABLE git_output)
+    else ()
         message(STATUS "no tag specified, defaulting to master")
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} checkout master
-                WORKING_DIRECTORY   ${TARGET_REPO_DIR}
-                OUTPUT_VARIABLE     git_output)
-    endif()
+                COMMAND ${GIT_EXECUTABLE} checkout master
+                WORKING_DIRECTORY ${TARGET_REPO_DIR}
+                OUTPUT_VARIABLE git_output)
+    endif ()
 
-    if(NOT PARGS_QUIET)
+    if (NOT PARGS_QUIET)
         message("${git_output}")
-    endif()
+    endif ()
 endfunction()
