@@ -1,9 +1,10 @@
 # CMake Git Clone
-![build status](https://travis-ci.org/tschuchortdev/cmake_git_clone.svg?branch=master) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/tschuchortdev/cmake_git_clone/issues)
 
 CMake module to automatically clone git repositories during configure time.
 
-This can be useful if you have CMake-only libraries such as [ucm](https://github.com/onqtam/ucm) that have no build script but have to be available at configure time. `ExternalProject_Add` can not be easily used for this because it executes at build time and only if other targets depend on it.
+This can be useful if you have CMake-only libraries such as [ucm](https://github.com/onqtam/ucm) that have no build
+script but have to be available at configure time. `ExternalProject_Add` can not be easily used for this because it
+executes at build time and only if other targets depend on it.
 
 ## Usage:
 
@@ -42,10 +43,11 @@ This can be useful if you have CMake-only libraries such as [ucm](https://github
              <project name>_SOURCE_DIR
                  top level source directory of the cloned project
 
+Copy the cmake folder to your project source directory and `include(cmake/GitUtils.cmake)` in the root CMakeLists.txt
+file.
 
-Copy the cmake folder to your project source directory and `include(cmake/GitUtils.cmake)` in the root CMakeLists.txt file.
-
-Call the `git_clone` function with url to a valid git repository. Output directory and branch, commit or tag are optional:
+Call the `git_clone` function with url to a valid git repository. Output directory and branch, commit or tag are
+optional:
 
     git_clone(
             PROJECT_NAME    ucm
